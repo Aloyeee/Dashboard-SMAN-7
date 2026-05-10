@@ -3,51 +3,40 @@
 import { useEffect, useState } from "react";
 import type { Stats } from "@/types";
 import {
-  BarChart, Bar, PieChart, Pie, Cell, RadarChart, Radar,
-  PolarGrid, PolarAngleAxis, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, Legend,
+  PieChart, Pie, Cell,
+  BarChart, Bar,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
+import {
+  sdqRangeLabel, iaaRangeLabel,
+  iaaValueColor, sdqValueColor,
+  IAA_STATUSES, IAA_COLORS, SDQ_COLORS,
+} from "@/lib/labels";
 
-const STATUS_COLORS: Record<string, string> = {
-  "Tidak/Sedikit Kecanduan": "#1D9E75",
-  "Kecanduan Borderline":    "#EF9F27",
-  "Kemungkinan Kecanduan":   "#E05C5C",
-};
-const SDQ_COLORS: Record<string, string> = {
-  Normal: "#1D9E75", Borderline: "#EF9F27", Abnormal: "#E05C5C",
-};
-const IAA_STATUSES = ["Tidak/Sedikit Kecanduan", "Kecanduan Borderline", "Kemungkinan Kecanduan"];
-const BLUE = "#378ADD", PURPLE = "#9B6CF7";
-
-function iaaColor(label: string) {
-  if (label === "Tidak/Sedikit Kecanduan") return "text-green-600";
-  if (label === "Kecanduan Borderline")    return "text-amber-500";
-  return "text-red-600";
-}
-function sdqColor(label: string) {
-  if (label === "Normal")     return "text-green-600";
-  if (label === "Borderline") return "text-amber-500";
-  return "text-red-600";
-}
+const BLUE   = "#378ADD";
+const PURPLE = "#9B6CF7";
 
 function StatCard({ label, value, sub, valueColor, subColor }: {
-  label: string; value: string | number; sub?: string;
-  valueColor?: string; subColor?: string;
+  label: string; value: string | number;
+  sub?: string; valueColor?: string; subColor?: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
-      <p className={`text-3xl font-semibold tracking-tight ${valueColor ?? "text-gray-800"}`}>{value}</p>
-      {sub && <p className={`text-xs mt-1 font-medium ${subColor ?? "text-gray-400"}`}>{sub}</p>}
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 text-left">
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className={`text-3xl font-bold tracking-tight mt-1 ${valueColor ?? "text-gray-800"}`}>{value}</p>
+      {sub && <p className={`text-xs mt-1 font-medium leading-snug ${subColor ?? "text-gray-400"}`}>{sub}</p>}
     </div>
   );
 }
 
-function ChartCard({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
+function ChartCard({ title, sub, children }: {
+  title: string; sub?: string; children: React.ReactNode;
+}) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <h3 className="text-sm font-medium text-gray-700 mb-0.5">{title}</h3>
-      {sub && <p className="text-xs text-gray-400 mb-3">{sub}</p>}
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
+      {sub && <p className="text-xs mt-0.5 mb-4 text-gray-400">{sub}</p>}
       {!sub && <div className="mb-4" />}
       {children}
     </div>
@@ -55,10 +44,10 @@ function ChartCard({ title, sub, children }: { title: string; sub?: string; chil
 }
 
 export default function StatsPanel() {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats, setStats]     = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"sdq" | "iaa">("sdq");
+  const [error, setError]     = useState<string | null>(null);
+  const [tab, setTab]         = useState<"sdq" | "iaa">("sdq");
 
   useEffect(() => {
     fetch("/api/stats")
@@ -69,45 +58,52 @@ export default function StatsPanel() {
   }, []);
 
   if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="text-sm text-gray-400 animate-pulse">Memuat data…</div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 animate-pulse">
+          <div className="h-3 bg-gray-100 rounded w-2/3 mb-3" />
+          <div className="h-8 bg-gray-100 rounded w-1/2 mb-2" />
+          <div className="h-3 bg-gray-100 rounded w-3/4" />
+        </div>
+      ))}
     </div>
   );
   if (error) return (
-    <div className="p-6 bg-red-50 rounded-xl border border-red-200 text-sm text-red-700">
+    <div className="p-6 bg-red-50 rounded-2xl border border-red-200 text-sm text-red-700">
       <strong>Error:</strong> {error}
     </div>
   );
   if (!stats) return null;
 
-  const { summary, iaaStatusChart, iaaByClassChart, sdqCategoryChart, sdqByClassChart, sdqSubscaleChart } = stats;
-  const sub = summary.avgSubscales;
-  const topSub = Object.entries(sub).sort((a, b) => b[1] - a[1])[0];
-  const subLabel: Record<string, string> = {
-    Prosocial: "Prososial", Emotional: "Emosional",
-    Conduct: "Perilaku", Hyperactive: "Hiperaktif", Peer: "Teman Sebaya",
-  };
+  const {
+    summary: s,
+    iaaStatusChart, iaaByClassChart,
+    sdqCategoryChart, sdqByClassChart, sdqSubscaleChart,
+  } = stats;
+
+  const totalSDQ = sdqCategoryChart.reduce((a, b) => a + b.value, 0);
+  const totalIAA = iaaStatusChart.reduce((a, b) => a + b.value, 0);
 
   return (
     <div className="space-y-6">
 
-      {/* ── Stat cards ── */}
+      {/* ── 4 stat cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total Responden" value={summary.totalRespondents} sub="siswa" />
-        <StatCard label="Jumlah Kelas" value={summary.totalKelas} sub="kelas" />
+        <StatCard label="Total Responden" value={s.totalRespondents} sub="siswa" />
+        <StatCard label="Jumlah Kelas"    value={s.totalKelas}       sub="kelas" />
         <StatCard
           label="Rata-rata Skor IAA"
-          value={summary.avgIAA}
-          sub={summary.iaaStatusLabel}
-          valueColor={iaaColor(summary.iaaStatusLabel)}
-          subColor={iaaColor(summary.iaaStatusLabel)}
+          value={s.avgIAA}
+          sub={iaaRangeLabel(s.iaaStatusLabel)}
+          valueColor={iaaValueColor(s.iaaStatusLabel)}
+          subColor={iaaValueColor(s.iaaStatusLabel)}
         />
         <StatCard
           label="Rata-rata Kesulitan SDQ"
-          value={summary.avgSDQDifficulties}
-          sub={`${summary.sdqCategoryLabel}`}
-          valueColor={sdqColor(summary.sdqCategoryLabel)}
-          subColor={sdqColor(summary.sdqCategoryLabel)}
+          value={s.avgSDQDifficulties}
+          sub={sdqRangeLabel(s.sdqCategoryLabel)}
+          valueColor={sdqValueColor(s.sdqCategoryLabel)}
+          subColor={sdqValueColor(s.sdqCategoryLabel)}
         />
       </div>
 
@@ -116,52 +112,60 @@ export default function StatsPanel() {
         {(["sdq", "iaa"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium border transition-all ${
-              tab === t ? "bg-white border-blue-400 text-blue-700 shadow-sm" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
+              tab === t
+                ? "bg-white border-blue-400 text-blue-700 shadow-sm"
+                : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
             }`}>
             {t === "sdq" ? "🧠 SDQ Kemenkes" : "📱 IAA"}
           </button>
         ))}
       </div>
 
-      {/* ── SDQ tab ── */}
+      {/* ══ SDQ tab ══ */}
       {tab === "sdq" && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ChartCard title="Total Kesulitan SDQ" sub="Distribusi status kesehatan mental siswa">
-              <ResponsiveContainer width="100%" height={220}>
+            <ChartCard title="Total Kesulitan SDQ" sub="Distribusi status kesehatan mental siswa (Kemenkes)">
+              <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie data={sdqCategoryChart} dataKey="value" nameKey="name"
-                    cx="50%" cy="50%" innerRadius={55} outerRadius={85}
-                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`}>
+                    cx="50%" cy="45%" innerRadius={70} outerRadius={100}
+                    startAngle={90} endAngle={-270} paddingAngle={2}
+                    labelLine={false} label={false}>
                     {sdqCategoryChart.map((e, i) => (
-                      <Cell key={i} fill={SDQ_COLORS[e.name] ?? "#ccc"} />
+                      <Cell key={i} fill={SDQ_COLORS[e.name] ?? "#ccc"} stroke="none" />
                     ))}
                   </Pie>
+                  <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+                    <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalSDQ}</tspan>
+                    <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
+                  </text>
                   <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
-                  <Legend />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Distribusi per Subskala" sub="Komposisi 5 subskala SDQ">
-              <ResponsiveContainer width="100%" height={220}>
-                <RadarChart data={sdqSubscaleChart} cx="50%" cy="50%" outerRadius={80}>
+            <ChartCard title="Distribusi per Subskala" sub="Rata-rata skor per subskala SDQ">
+              <ResponsiveContainer width="100%" height={260}>
+                <RadarChart data={sdqSubscaleChart} cx="50%" cy="50%" outerRadius={85}>
                   <PolarGrid />
                   <PolarAngleAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <Radar dataKey="avg" stroke={BLUE} fill={BLUE} fillOpacity={0.25} name="Rata-rata" />
-                  <Tooltip />
-                  <Legend />
+                  <Tooltip formatter={(v: any) => [v, "Rata-rata"]} />
+                  <Legend iconSize={8} wrapperStyle={{ fontSize: 12 }} />
                 </RadarChart>
               </ResponsiveContainer>
             </ChartCard>
           </div>
 
-          <ChartCard title="Rata-rata Kesulitan SDQ per Kelas" sub="Dihitung dari total kesulitan (difficulties) tiap siswa">
+          <ChartCard title="Rata-rata Total Kesulitan SDQ per Kelas"
+            sub="Skala Kemenkes 0–40 · Normal ≤15 · Borderline 16–19 · Abnormal ≥20">
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={sdqByClassChart} margin={{ left: -10 }}>
+              <BarChart data={sdqByClassChart} margin={{ left: -10, top: 4 }}>
                 <XAxis dataKey="kelas" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} domain={[0, 40]} />
-                <Tooltip formatter={(v: any) => [`${v}`, "Avg Total Kesulitan"]} />
+                <Tooltip formatter={(v: any) => [`${v}`, "Avg Total Kesulitan"]} labelFormatter={l => `Kelas: ${l}`} />
                 <Bar dataKey="avgDifficulties" fill={PURPLE} radius={[4, 4, 0, 0]} name="Avg Kesulitan" />
               </BarChart>
             </ResponsiveContainer>
@@ -169,36 +173,48 @@ export default function StatsPanel() {
         </div>
       )}
 
-      {/* ── IAA tab ── */}
+      {/* ══ IAA tab ══ */}
       {tab === "iaa" && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ChartCard title="Distribusi Status Kecanduan Internet" sub="Keseluruhan siswa">
-              <ResponsiveContainer width="100%" height={220}>
+            <ChartCard title="Distribusi Status Kecanduan Internet" sub="Seluruh siswa berdasarkan kategori IAA">
+              <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie data={iaaStatusChart} dataKey="value" nameKey="name"
-                    cx="50%" cy="50%" innerRadius={55} outerRadius={85}
-                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`}>
+                    cx="50%" cy="45%" innerRadius={70} outerRadius={100}
+                    startAngle={90} endAngle={-270} paddingAngle={2}
+                    labelLine={false} label={false}>
                     {iaaStatusChart.map((e, i) => (
-                      <Cell key={i} fill={STATUS_COLORS[e.name] ?? "#ccc"} />
+                      <Cell key={i} fill={IAA_COLORS[e.name] ?? "#ccc"} stroke="none" />
                     ))}
                   </Pie>
+                  <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+                    <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalIAA}</tspan>
+                    <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
+                  </text>
                   <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
-                  <Legend />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Distribusi Skor Berdasarkan Kelas" sub="Jumlah siswa per kategori IAA tiap kelas">
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={iaaByClassChart} margin={{ left: -10 }}>
+            <ChartCard title="Distribusi Kategori IAA per Kelas" sub="Jumlah siswa per kategori tiap kelas">
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={iaaByClassChart} margin={{ left: -10, top: 4 }}>
                   <XAxis dataKey="kelas" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                  <Tooltip />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  {IAA_STATUSES.map(s => (
-                    <Bar key={s} dataKey={s} name={s}
-                      fill={STATUS_COLORS[s]} radius={[3, 3, 0, 0]} />
+                  <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" iconSize={8}
+                    formatter={(v) => ({
+                      "Tidak/Sedikit Kecanduan": "Tidak/Sedikit",
+                      "Kecanduan Borderline":    "Borderline",
+                      "Kemungkinan Kecanduan":   "Kemungkinan",
+                      "Kecanduan Signifikan":    "Signifikan",
+                    }[v] ?? v)}
+                  />
+                  {IAA_STATUSES.map(st => (
+                    <Bar key={st} dataKey={st} name={st}
+                      fill={IAA_COLORS[st]} radius={[3, 3, 0, 0]} stackId="a" />
                   ))}
                 </BarChart>
               </ResponsiveContainer>
