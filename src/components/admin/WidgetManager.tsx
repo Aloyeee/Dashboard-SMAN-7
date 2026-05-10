@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { X, BarChart3, Table, Gauge } from "lucide-react";
 import type { WidgetConfig, ChartType, WidgetType } from "@/types";
 import { CHART_TYPES, WIDGET_TYPES, PRESET_COLORS, AVAILABLE_SHEETS } from "@/types";
 
@@ -62,8 +63,13 @@ export default function WidgetManager({ widgets, onChange }: Props) {
               className={`flex items-center justify-between px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
                 editing === w.id ? "border-blue-400 bg-blue-50 text-blue-800" : "border-gray-200 bg-white hover:border-gray-300 text-gray-700"
               }`}>
-              <span className="truncate">{WIDGET_TYPES.find(t => t.value === w.type)?.icon} {w.title}</span>
-              <button onClick={e => { e.stopPropagation(); removeWidget(w.id); }} className="text-gray-300 hover:text-red-500 ml-1 flex-shrink-0">✕</button>
+              <span className="truncate inline-flex items-center gap-2">
+                {w.type === "chart" ? <BarChart3 className="h-4 w-4" /> : w.type === "table" ? <Table className="h-4 w-4" /> : <Gauge className="h-4 w-4" />}
+                {w.title}
+              </span>
+              <button onClick={e => { e.stopPropagation(); removeWidget(w.id); }} className="text-gray-300 hover:text-red-500 ml-1 flex-shrink-0">
+                <X className="h-4 w-4" />
+              </button>
             </div>
           ))}
           {!widgets.length && <p className="text-xs text-gray-400 text-center py-6">Belum ada widget</p>}

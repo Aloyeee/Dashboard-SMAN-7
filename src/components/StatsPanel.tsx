@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Brain, Smartphone } from "lucide-react";
 import type { Stats } from "@/types";
 import {
   PieChart, Pie, Cell,
@@ -116,7 +117,7 @@ export default function StatsPanel() {
                 ? "bg-white border-blue-400 text-blue-700 shadow-sm"
                 : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
             }`}>
-            {t === "sdq" ? "🧠 SDQ Kemenkes" : "📱 IAA"}
+            {t === "sdq" ? <><Brain className="h-4 w-4" /> SDQ Kemenkes</> : <><Smartphone className="h-4 w-4" /> IAA</>}
           </button>
         ))}
       </div>
@@ -205,12 +206,15 @@ export default function StatsPanel() {
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                   <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
                   <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" iconSize={8}
-                    formatter={(v) => ({
-                      "Tidak/Sedikit Kecanduan": "Tidak/Sedikit",
-                      "Kecanduan Borderline":    "Borderline",
-                      "Kemungkinan Kecanduan":   "Kemungkinan",
-                      "Kecanduan Signifikan":    "Signifikan",
-                    }[v] ?? v)}
+                    formatter={(value: string | number) => {
+                      const labelMap: Record<string, string> = {
+                        "Tidak/Sedikit Kecanduan": "Tidak/Sedikit",
+                        "Kecanduan Borderline":    "Borderline",
+                        "Kemungkinan Kecanduan":   "Kemungkinan",
+                        "Kecanduan Signifikan":    "Signifikan",
+                      };
+                      return labelMap[String(value)] ?? value;
+                    }}
                   />
                   {IAA_STATUSES.map(st => (
                     <Bar key={st} dataKey={st} name={st}

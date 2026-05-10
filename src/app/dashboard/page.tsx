@@ -45,7 +45,7 @@ export default async function DashboardPage() {
           <span className="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-medium">admin</span>
           <a href="/" className="inline-flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg transition-colors">
             <ArrowLeft className="h-4 w-4" />
-            Publik
+            Landing Page
           </a>
           <LogoutConfirm />
         </div>

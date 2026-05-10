@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
+import { Settings, Table, Save, RotateCcw, CheckCircle } from "lucide-react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import WidgetManager from "@/components/admin/WidgetManager";
@@ -14,8 +15,8 @@ import type { DashboardLayout, WidgetConfig, Stats } from "@/types";
 const ResponsiveGrid = WidthProvider(Responsive);
 
 const TABS = [
-  { id: "customize", label: "⚙ Customize Dashboard" },
-  { id: "data",      label: "📋 Data Table" },
+  { id: "customize", label: "Customize Dashboard", icon: Settings },
+  { id: "data",      label: "Data Table", icon: Table },
 ];
 
 interface Props { initialConfig: DashboardLayout }
@@ -79,14 +80,17 @@ export default function AdminPanel({ initialConfig }: Props) {
             className={`flex-1 text-xs py-2 px-3 rounded-lg font-medium transition-colors ${
               tab === t.id ? "bg-blue-600 text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
             }`}>
-            {t.label}
+            <span className="inline-flex items-center gap-2">
+              <t.icon className="h-4 w-4" />
+              {t.label}
+            </span>
           </button>
         ))}
         <div className="ml-2 flex items-center gap-2 flex-shrink-0">
-          {saved && <span className="text-xs text-green-600">✓ Tersimpan</span>}
+          {saved && <span className="inline-flex items-center gap-1 text-xs text-green-600"><CheckCircle className="h-4 w-4" />Tersimpan</span>}
           <button onClick={saveAll} disabled={saving}
-            className="text-xs px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors whitespace-nowrap">
-            {saving ? "Menyimpan…" : "💾 Simpan Semua"}
+            className="inline-flex items-center gap-2 text-xs px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors whitespace-nowrap">
+            {saving ? "Menyimpan…" : <><Save className="h-4 w-4" /> Simpan Semua</>}
           </button>
         </div>
       </div>
@@ -142,8 +146,8 @@ export default function AdminPanel({ initialConfig }: Props) {
                 <p className="text-xs text-gray-400 mt-0.5">Lihat tampilan dashboard secara real-time</p>
               </div>
               <button onClick={handleRefreshData}
-                className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors font-medium whitespace-nowrap">
-                ↻ Refresh Data
+                className="inline-flex items-center gap-2 text-xs px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors font-medium whitespace-nowrap">
+                <RotateCcw className="h-4 w-4" /> Refresh Data
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">

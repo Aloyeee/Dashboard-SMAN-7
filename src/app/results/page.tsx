@@ -180,7 +180,7 @@ export default function ResultsPage() {
               <rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".5"/>
             </svg>
           </div>
-          <span className="text-sm font-semibold text-gray-800">Hasil Skrining</span>
+          <span className="text-sm font-semibold text-gray-800">Dashboard Skrining Kesehatan Mental dan Kecanduan Digital SMA 7 Semarang</span>
         </div>
         <div className="flex items-center gap-3">
           <a href="/"
@@ -193,8 +193,9 @@ export default function ResultsPage() {
           </a>
           {isAdmin ? (
             <a href="/dashboard"
-              className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              ⚙ Panel Admin
+              className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <Settings className="h-4 w-4" />
+              Panel Admin
             </a>
           ) : (
             <a href="/signin"
@@ -228,7 +229,7 @@ export default function ResultsPage() {
                 ? "bg-white border-blue-400 text-blue-700 shadow-sm"
                 : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
             }`}>
-            <span>🧠</span> SDQ Kemenkes
+            <Brain className="h-4 w-4" /> SDQ Kemenkes
           </button>
           <button onClick={() => setTab("iaa")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
@@ -236,7 +237,7 @@ export default function ResultsPage() {
                 ? "bg-white border-blue-400 text-blue-700 shadow-sm"
                 : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
             }`}>
-            <span>📱</span> IAA
+            <Smartphone className="h-4 w-4" /> IAA
           </button>
         </div>
 
@@ -262,7 +263,7 @@ export default function ResultsPage() {
 
       {/* ── Footer ──────────────────────────────────────────── */}
       <footer className="border-t border-gray-100 bg-white px-6 py-6 text-center text-xs text-gray-400 mt-12">
-        Dashboard Kesehatan Mental Siswa · Data bersumber dari Google Sheets
+        Dashboard Kesehatan Mental Siswa · SMA 7 Semarang · {new Date().getFullYear()}
       </footer>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
+import { Settings, CheckCircle } from "lucide-react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import type { DashboardLayout, WidgetConfig } from "@/types";
@@ -53,13 +54,15 @@ export default function DashboardGrid({ isAdmin, config }: Props) {
     <div>
       {isAdmin && (
         <div className="flex items-center gap-3 mb-4 px-4 py-2.5 bg-blue-50 rounded-xl border border-blue-200">
-          <span className="text-sm text-blue-700 font-medium">⚙ Admin mode — drag &amp; resize widgets freely</span>
+          <span className="inline-flex items-center gap-2 text-sm text-blue-700 font-medium">
+            <Settings className="h-4 w-4" /> Admin mode — drag &amp; resize widgets freely
+          </span>
           <button
             onClick={saveLayout}
             disabled={saving}
-            className="ml-auto text-sm px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="ml-auto inline-flex items-center gap-2 text-sm px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {saving ? "Saving…" : saved ? "✓ Saved" : "Save layout"}
+            {saving ? "Saving…" : saved ? <><CheckCircle className="h-4 w-4" /> Saved</> : "Save layout"}
           </button>
         </div>
       )}

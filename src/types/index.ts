@@ -53,9 +53,9 @@ export const CHART_TYPES: { value: ChartType; label: string }[] = [
   { value: "radar", label: "Radar Chart" },
 ];
 export const WIDGET_TYPES: { value: WidgetType; label: string; icon: string }[] = [
-  { value: "chart", label: "Chart",      icon: "📊" },
-  { value: "table", label: "Tabel Data", icon: "📋" },
-  { value: "stat",  label: "Stat Card",  icon: "🔢" },
+  { value: "chart", label: "Chart",      icon: "Chart" },
+  { value: "table", label: "Tabel Data", icon: "Table" },
+  { value: "stat",  label: "Stat Card",  icon: "Stat" },
 ];
 export const PRESET_COLORS = [
   "#378ADD","#EF9F27","#E05C5C","#1D9E75","#9B6CF7","#F06292","#26C6DA","#8D6E63","#546E7A",

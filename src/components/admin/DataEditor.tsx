@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
 import { AVAILABLE_SHEETS } from "@/types";
+import TambahDataModal from "./TambahDataModal";
 
 type Cell = string;
 type Grid = Cell[][];
@@ -99,14 +101,12 @@ export default function DataEditor() {
           className="text-sm font-medium text-gray-500 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300">
           {AVAILABLE_SHEETS.filter(s => s !== "Config").map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <a href="https://tally.so/r/VL9GPN" target="_blank" rel="noopener noreferrer"
-          className="text-sm px-3 font-medium text-white bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition-colors">
-          Tambah Data
-        </a>
+        <TambahDataModal />
 
         <button onClick={() => load(sheet)} disabled={loading}
-          className="text-sm px-3 font-medium text-gray-500 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors">
-          {loading ? "Memuat…" : "↻ Refresh"}
+          className="inline-flex items-center gap-2 text-sm px-3 font-medium text-gray-500 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors">
+          <RotateCcw className="h-4 w-4" />
+          {loading ? "Memuat…" : "Refresh"}
         </button>
 
         {/* Column count badge */}
@@ -176,8 +176,9 @@ export default function DataEditor() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
           <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
-            className="text-xs px-3 py-1.5 border text-gray-500 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-            ← Sebelumnya
+            className="inline-flex items-center gap-2 text-xs px-3 py-1.5 border text-gray-500 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            Sebelumnya
           </button>
           {Array.from({ length: Math.min(totalPages, 8) }, (_, i) => i + 1).map(p => (
             <button key={p} onClick={() => setCurrentPage(p)}
@@ -189,8 +190,9 @@ export default function DataEditor() {
           ))}
           {totalPages > 8 && <span className="text-xs text-gray-400">…{totalPages}</span>}
           <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
-            className="text-xs px-3 py-1.5 border text-gray-500 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-            Selanjutnya →
+            className="inline-flex items-center gap-2 text-xs px-3 py-1.5 border text-gray-500 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            Selanjutnya
+            <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       )}
