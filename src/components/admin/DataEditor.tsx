@@ -99,6 +99,11 @@ export default function DataEditor() {
           className="text-sm font-medium text-gray-500 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300">
           {AVAILABLE_SHEETS.filter(s => s !== "Config").map(s => <option key={s} value={s}>{s}</option>)}
         </select>
+        <a href="https://tally.so/r/VL9GPN" target="_blank" rel="noopener noreferrer"
+          className="text-sm px-3 font-medium text-white bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition-colors">
+          Tambah Data
+        </a>
+
         <button onClick={() => load(sheet)} disabled={loading}
           className="text-sm px-3 font-medium text-gray-500 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors">
           {loading ? "Memuat…" : "↻ Refresh"}

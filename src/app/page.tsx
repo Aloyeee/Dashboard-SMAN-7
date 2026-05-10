@@ -1,6 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { Brain, Smartphone, Settings, Target, BarChart3, Users } from "lucide-react";
 import type { Stats } from "@/types";
 import { sdqRangeLabel, iaaRangeLabel, iaaValueColor, sdqValueColor } from "@/lib/labels";
 
@@ -52,13 +53,16 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <a href="/" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Home</a>
             <a href="/results" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Dashboard</a>
-            <a href="/dashboard" className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">⚙ Panel Admin</a>
+            <a href="/dashboard" className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <Settings className="h-4 w-4" />
+              Panel Admin
+            </a>
           </div>
         ) : (
           <div className="flex items-center gap-3">
             <a href="/" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Home</a>
             <a href="/results" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Dashboard</a>
-            <a href="/api/auth/signin" className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Login Admin</a>
+            <a href="/signin" className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Login Admin</a>
           </div>
         )}
       </nav>
@@ -126,7 +130,9 @@ export default function LandingPage() {
         <p className="text-sm text-gray-500 mb-6">Instrumen skrining kesehatan mental dan kecanduan digital untuk siswa SMA</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4 text-xl">🧠</div>
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4 text-blue-600">
+              <Brain className="h-5 w-5" />
+            </div>
             <h3 className="text-base font-semibold text-gray-800 mb-2">SDQ — Strengths and Difficulties Questionnaire</h3>
             <p className="text-sm text-gray-500 leading-relaxed mb-3">
               Instrumen skrining kesehatan mental berbasis 25 pertanyaan yang mengukur 5 subskala:
@@ -139,7 +145,9 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mb-4 text-xl">📱</div>
+            <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mb-4 text-purple-600">
+            <Smartphone className="h-5 w-5" />
+          </div>
             <h3 className="text-base font-semibold text-gray-800 mb-2">IAA — Internet Addiction Assessment</h3>
             <p className="text-sm text-gray-500 leading-relaxed mb-3">
               Instrumen pengukuran tingkat kecanduan internet berbasis 18 item pertanyaan dengan total skor 0–72.
@@ -156,15 +164,15 @@ export default function LandingPage() {
           <h3 className="text-base font-semibold text-gray-800 mb-3">Mengapa Skrining Ini Penting?</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
             <div className="flex items-start gap-3">
-              <span className="text-blue-600 text-lg">🎯</span>
+              <Target className="h-5 w-5 text-blue-600" />
               <div><strong>Deteksi Dini</strong><br />Mengidentifikasi masalah sebelum menjadi lebih serius</div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-blue-600 text-lg">📊</span>
+              <BarChart3 className="h-5 w-5 text-blue-600" />
               <div><strong>Data Berbasis</strong><br />Dasar perencanaan program bimbingan dan konseling</div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-blue-600 text-lg">🤝</span>
+              <Users className="h-5 w-5 text-blue-600" />
               <div><strong>Dukungan Terintegrasi</strong><br />Kolaborasi guru, orang tua, dan tenaga kesehatan mental</div>
             </div>
           </div>

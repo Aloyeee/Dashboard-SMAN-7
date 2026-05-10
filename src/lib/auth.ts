@@ -8,6 +8,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  pages: {
+    signIn: "/signin",
+  },
   callbacks: {
     async session({ session }) {
       const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map(e => e.trim());

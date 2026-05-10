@@ -1,6 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { Brain, Smartphone, Settings } from "lucide-react";
 import {
   PieChart, Pie, Cell, BarChart, Bar, RadarChart, Radar,
   PolarGrid, PolarAngleAxis, XAxis, YAxis, Tooltip,
@@ -190,15 +191,13 @@ export default function ResultsPage() {
             className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors">
             Dashboard
           </a>
-          {status === "loading" ? (
-            <div className="w-20 h-8 bg-gray-100 rounded-lg animate-pulse" />
-          ) : isAdmin ? (
+          {isAdmin ? (
             <a href="/dashboard"
               className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               ⚙ Panel Admin
             </a>
           ) : (
-            <a href="/api/auth/signin"
+            <a href="/signin"
               className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               Login Admin
             </a>

@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import AdminPanel from "@/components/admin/AdminPanel";
+import LogoutConfirm from "@/components/LogoutConfirm";
 import type { DashboardLayout } from "@/types";
 
 async function getLayoutConfig(): Promise<DashboardLayout> {
@@ -16,7 +18,7 @@ async function getLayoutConfig(): Promise<DashboardLayout> {
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/api/auth/signin");
+  if (!session) redirect("/signin");
   if ((session.user as any).role !== "admin") redirect("/");
 
   const config = await getLayoutConfig();
@@ -41,8 +43,11 @@ export default async function DashboardPage() {
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500">{session.user?.email}</span>
           <span className="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-medium">admin</span>
-          <a href="/" className="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg transition-colors">← Publik</a>
-          <a href="/api/auth/signout" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Keluar</a>
+          <a href="/" className="inline-flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            Publik
+          </a>
+          <LogoutConfirm />
         </div>
       </header>
       <div className="max-w-screen-xl mx-auto px-6 py-6">
