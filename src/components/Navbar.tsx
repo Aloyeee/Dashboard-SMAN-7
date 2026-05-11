@@ -50,13 +50,6 @@ export default function Navbar({ session, status }: NavbarProps) {
                     {link.label}
                   </a>
                 ))}
-                <a
-                  href={actionLink.href}
-                  className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  {isAdmin ? <Settings className="h-4 w-4" /> : null}
-                  {actionLink.label}
-                </a>
               </>
             )}
           </div>
@@ -93,14 +86,6 @@ export default function Navbar({ session, status }: NavbarProps) {
                     {link.label}
                   </a>
                 ))}
-                <a
-                  href={actionLink.href}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {isAdmin ? <Settings className="h-4 w-4" /> : null}
-                  {actionLink.label}
-                </a>
               </>
             )}
           </div>

@@ -45,7 +45,7 @@ function iaaCategory(score: number): string {
 
 // ── Cache ──────────────────────────────────────────────────────
 let cache: { data: Stats; ts: number } | null = null;
-const CACHE_TTL = 60 * 1000;
+const CACHE_TTL = 25 * 1000;
 
 export function clearStatsCache() { cache = null; }
 

@@ -61,14 +61,14 @@ function SDQSection({ stats }: { stats: Stats }) {
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={stats.sdqCategoryChart} dataKey="value" nameKey="name"
-                cx="50%" cy="45%" innerRadius={70} outerRadius={100}
+                cx="50%" cy="45%" innerRadius={65} outerRadius={100}
                 startAngle={90} endAngle={-270} paddingAngle={2}
                 labelLine={false} label={false}>
                 {stats.sdqCategoryChart.map((e, i) => (
                   <Cell key={i} fill={SDQ_COLORS[e.name] ?? "#ccc"} stroke="none" />
                 ))}
               </Pie>
-              <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+              <text x="50%" y="46%" textAnchor="middle" dominantBaseline="middle">
                 <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalSDQ}</tspan>
                 <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
               </text>
@@ -117,17 +117,17 @@ function IAASection({ stats }: { stats: Stats }) {
 
         {/* Donut */}
         <Card title="Status Kecanduan Internet" sub="Distribusi kategori IAA">
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={300 }>
             <PieChart>
               <Pie data={stats.iaaStatusChart} dataKey="value" nameKey="name"
-                cx="50%" cy="45%" innerRadius={70} outerRadius={100}
+                cx="50%" cy="46%" innerRadius={65} outerRadius={100}
                 startAngle={90} endAngle={-270} paddingAngle={2}
                 labelLine={false} label={false}>
                 {stats.iaaStatusChart.map((e, i) => (
                   <Cell key={i} fill={STATUS_COLORS[e.name] ?? "#ccc"} stroke="none" />
                 ))}
               </Pie>
-              <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+              <text x="50%" y="45%" textAnchor="middle" dominantBaseline="middle">
                 <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalIAA}</tspan>
                 <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
               </text>
