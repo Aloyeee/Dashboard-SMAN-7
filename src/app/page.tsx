@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import StatCard from "@/components/StatCard";
 import type { Stats } from "@/types";
 import { sdqRangeLabel, iaaRangeLabel, iaaValueColor, sdqValueColor } from "@/lib/labels";
+import { Tooltip } from "recharts";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();

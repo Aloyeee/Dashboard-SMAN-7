@@ -255,7 +255,7 @@ export default function ResultsPage() {
       </div>
 
       <footer className="border-t border-gray-100 bg-white px-6 py-6 text-center text-xs text-gray-400 mt-12">
-        Dashboard Kesehatan Mental Siswa · Data bersumber dari Google Sheets
+        Dashboard Kesehatan Mental Siswa · SMA 7 Semarang · {new Date().getFullYear()}
       </footer>
     </div>
   );

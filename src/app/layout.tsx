@@ -16,8 +16,9 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Admin & viewer dashboard powered by Google Sheets",
+  title: "Dashboard SMAN 7 Semarang ",
+  icons: "/favicon.ico",
+  description: "Dasboard Hasil Skrining Kesehatan Mental dan Kecanduan Digital Siswa SMA 7 Semarang",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
