@@ -1,26 +1,14 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Brain, Smartphone, Settings, Target, BarChart3, Users } from "lucide-react";
+import { Brain, Smartphone, Target, BarChart3, Users } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import StatCard from "@/components/StatCard";
 import type { Stats } from "@/types";
 import { sdqRangeLabel, iaaRangeLabel, iaaValueColor, sdqValueColor } from "@/lib/labels";
 
-function Stat({ label, value, sub, valueColor, subColor }: {
-  label: string; value: string | number;
-  sub?: string; valueColor?: string; subColor?: string;
-}) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 text-left">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className={`text-3xl font-bold tracking-tight mt-1 ${valueColor ?? "text-gray-800"}`}>{value}</p>
-      {sub && <p className={`text-xs mt-1 font-medium leading-snug ${subColor ?? "text-gray-400"}`}>{sub}</p>}
-    </div>
-  );
-}
-
 export default function LandingPage() {
   const { data: session, status } = useSession();
-  const isAdmin = (session?.user as any)?.role === "admin";
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
@@ -33,42 +21,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <nav className="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-              <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white"/>
-              <rect x="14" y="3" width="7" height="7" rx="1.5" fill="white" opacity=".7"/>
-              <rect x="3" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".7"/>
-              <rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".5"/>
-            </svg>
-          </div>
-          <span className="text-sm font-semibold text-gray-800">
-            Dashboard Skrining Kesehatan Mental dan Kecanduan Digital SMA 7 Semarang
-          </span>
-        </div>
-        {status === "loading" ? (
-          <div className="w-24 h-8 bg-gray-100 rounded-lg animate-pulse" />
-        ) : isAdmin ? (
-          <div className="flex items-center gap-3">
-            <a href="/" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Home</a>
-            <a href="/results" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Dashboard</a>
-            <a href="/dashboard" className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Settings className="h-4 w-4" />
-              Panel Admin
-            </a>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <a href="/" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Home</a>
-            <a href="/results" className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800">Dashboard</a>
-            <a href="/signin" className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Login Admin</a>
-          </div>
-        )}
-      </nav>
+      <Navbar session={session ?? null} status={status} />
 
       <section className="bg-white border-b border-gray-100">
-        <div className="max-w-screen-lg mx-auto px-6 py-14 text-center">
+        <div className="max-w-5xl mx-auto px-6 py-14 text-center">
           <span className="inline-block text-xs font-medium px-3 py-1 bg-blue-50 text-blue-600 rounded-full mb-4">
             Skrining Kesehatan Mental 2026
           </span>
@@ -86,16 +42,16 @@ export default function LandingPage() {
               const { summary: s } = stats;
               return (
                 <>
-                  <Stat label="Total Responden" value={s.totalRespondents} sub="siswa" />
-                  <Stat label="Jumlah Kelas"    value={s.totalKelas}       sub="kelas" />
-                  <Stat
+                  <StatCard label="Total Responden" value={s.totalRespondents} sub="siswa" />
+                  <StatCard label="Jumlah Kelas"    value={s.totalKelas}       sub="kelas" />
+                  <StatCard
                     label="Rata-rata Skor IAA"
                     value={s.avgIAA}
                     sub={iaaRangeLabel(s.iaaStatusLabel)}
                     valueColor={iaaValueColor(s.iaaStatusLabel)}
                     subColor={iaaValueColor(s.iaaStatusLabel)}
                   />
-                  <Stat
+                  <StatCard
                     label="Rata-rata Kesulitan SDQ"
                     value={s.avgSDQDifficulties}
                     sub={sdqRangeLabel(s.sdqCategoryLabel)}
@@ -125,7 +81,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="max-w-screen-lg mx-auto px-6 py-12">
+      <section className="max-w-5xl mx-auto px-6 py-12">
         <h2 className="text-xl font-bold text-gray-800 mb-2">Tentang Skrining Ini</h2>
         <p className="text-sm text-gray-500 mb-6">Instrumen skrining kesehatan mental dan kecanduan digital untuk siswa SMA</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

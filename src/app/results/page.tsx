@@ -1,35 +1,43 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Brain, Smartphone, Settings } from "lucide-react";
+import { Brain, Smartphone } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import StatCard from "@/components/StatCard";
 import {
   PieChart, Pie, Cell, BarChart, Bar, RadarChart, Radar,
   PolarGrid, PolarAngleAxis, XAxis, YAxis, Tooltip,
   ResponsiveContainer, Legend,
 } from "recharts";
+import { sdqRangeLabel, iaaRangeLabel, iaaValueColor, sdqValueColor } from "@/lib/labels";
 
-// ── Colour tokens ──────────────────────────────────────────────
+// ── Colors ─────────────────────────────────────────────────────
 const STATUS_COLORS: Record<string, string> = {
   "Tidak/Sedikit Kecanduan": "#1D9E75",
   "Kecanduan Borderline":    "#EF9F27",
   "Kemungkinan Kecanduan":   "#E05C5C",
+  "Kecanduan Signifikan":    "#991B1B",
 };
 const SDQ_COLORS: Record<string, string> = {
   Normal: "#1D9E75", Borderline: "#EF9F27", Abnormal: "#E05C5C",
 };
-const BLUE = "#378ADD";
+const BLUE   = "#378ADD";
 const PURPLE = "#9B6CF7";
 
 interface Stats {
-  summary: { totalRespondents: number; avgIAA: number; avgSDQDifficulties: number; totalKelas: number };
-  iaaStatusChart: { name: string; value: number }[];
-  iaaByClassChart: { kelas: string; avgScore: number }[];
+  summary: {
+    totalRespondents: number; totalKelas: number;
+    avgIAA: number; iaaStatusLabel: string;
+    avgSDQDifficulties: number; sdqCategoryLabel: string;
+  };
+  iaaStatusChart:   { name: string; value: number }[];
+  iaaByClassChart:  { kelas: string; avgScore: number; [key: string]: any }[];
   sdqCategoryChart: { name: string; value: number }[];
-  sdqByClassChart: { kelas: string; avgDifficulties: number }[];
+  sdqByClassChart:  { kelas: string; avgDifficulties: number }[];
   sdqSubscaleChart: { name: string; avg: number }[];
 }
 
-// ── Reusable card ──────────────────────────────────────────────
+// ── Shared components ──────────────────────────────────────────
 function Card({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -41,55 +49,58 @@ function Card({ title, sub, children }: { title: string; sub?: string; children:
   );
 }
 
-// ── Stat pill ──────────────────────────────────────────────────
-function Stat({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className={`text-3xl font-bold tracking-tight mt-1 ${color ?? "text-gray-800"}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
-    </div>
-  );
-}
-
 // ── SDQ section ────────────────────────────────────────────────
 function SDQSection({ stats }: { stats: Stats }) {
+  const totalSDQ = stats.sdqCategoryChart.reduce((a, b) => a + b.value, 0);
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card title="Total Kesulitan SDQ" sub="Distribusi kategori kesehatan mental">
-          <ResponsiveContainer width="100%" height={220}>
+
+        {/* Donut */}
+        <Card title="Total Kesulitan SDQ" sub="Distribusi kategori kesehatan mental (Kemenkes)">
+          <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={stats.sdqCategoryChart} dataKey="value" nameKey="name"
-                cx="50%" cy="50%" innerRadius={55} outerRadius={85}
-                label={({ percent }) => `${(percent * 100).toFixed(0)}%`}>
+                cx="50%" cy="45%" innerRadius={70} outerRadius={100}
+                startAngle={90} endAngle={-270} paddingAngle={2}
+                labelLine={false} label={false}>
                 {stats.sdqCategoryChart.map((e, i) => (
-                  <Cell key={i} fill={SDQ_COLORS[e.name] ?? "#ccc"} />
+                  <Cell key={i} fill={SDQ_COLORS[e.name] ?? "#ccc"} stroke="none" />
                 ))}
               </Pie>
+              <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+                <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalSDQ}</tspan>
+                <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
+              </text>
               <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
-              <Legend />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
         </Card>
+
+        {/* Radar */}
         <Card title="Distribusi per Subskala" sub="Rata-rata 5 subskala SDQ">
-          <ResponsiveContainer width="100%" height={220}>
-            <RadarChart data={stats.sdqSubscaleChart} cx="50%" cy="50%" outerRadius={80}>
+          <ResponsiveContainer width="100%" height={260}>
+            <RadarChart data={stats.sdqSubscaleChart} cx="50%" cy="50%" outerRadius={85}>
               <PolarGrid />
               <PolarAngleAxis dataKey="name" tick={{ fontSize: 11 }} />
-              <Radar dataKey="avg" stroke={BLUE} fill={BLUE} fillOpacity={0.25} />
-              <Tooltip />
+              <Radar dataKey="avg" stroke={BLUE} fill={BLUE} fillOpacity={0.25} name="Rata-rata" />
+              <Tooltip formatter={(v: any) => [v, "Rata-rata"]} />
+              <Legend iconSize={8} wrapperStyle={{ fontSize: 12 }} />
             </RadarChart>
           </ResponsiveContainer>
         </Card>
       </div>
-      <Card title="Rata-rata Kesulitan SDQ per Kelas" sub="Total difficulties per kelas">
+
+      {/* Bar per class */}
+      <Card title="Rata-rata Kesulitan SDQ per Kelas"
+        sub="Skala Kemenkes 0–40 · Normal ≤15 · Borderline 16–19 · Abnormal ≥20">
         <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={stats.sdqByClassChart} margin={{ left: -10 }}>
+          <BarChart data={stats.sdqByClassChart} margin={{ left: -10, top: 4 }}>
             <XAxis dataKey="kelas" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} domain={[0, 40]} />
-            <Tooltip formatter={(v: any) => [`${v}`, "Avg Kesulitan"]} />
-            <Bar dataKey="avgDifficulties" fill={PURPLE} radius={[4, 4, 0, 0]} />
+            <Tooltip formatter={(v: any) => [`${v}`, "Avg Kesulitan"]} labelFormatter={l => `Kelas: ${l}`} />
+            <Bar dataKey="avgDifficulties" fill={PURPLE} radius={[4, 4, 0, 0]} name="Avg Kesulitan" />
           </BarChart>
         </ResponsiveContainer>
       </Card>
@@ -99,42 +110,64 @@ function SDQSection({ stats }: { stats: Stats }) {
 
 // ── IAA section ────────────────────────────────────────────────
 function IAASection({ stats }: { stats: Stats }) {
+  const totalIAA = stats.iaaStatusChart.reduce((a, b) => a + b.value, 0);
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Donut */}
         <Card title="Status Kecanduan Internet" sub="Distribusi kategori IAA">
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={stats.iaaStatusChart} dataKey="value" nameKey="name"
-                cx="50%" cy="50%" innerRadius={55} outerRadius={85}
-                label={({ percent }) => `${(percent * 100).toFixed(0)}%`}>
+                cx="50%" cy="45%" innerRadius={70} outerRadius={100}
+                startAngle={90} endAngle={-270} paddingAngle={2}
+                labelLine={false} label={false}>
                 {stats.iaaStatusChart.map((e, i) => (
-                  <Cell key={i} fill={STATUS_COLORS[e.name] ?? "#ccc"} />
+                  <Cell key={i} fill={STATUS_COLORS[e.name] ?? "#ccc"} stroke="none" />
                 ))}
               </Pie>
+              <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+                <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalIAA}</tspan>
+                <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
+              </text>
               <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
-              <Legend />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
         </Card>
-        <Card title="Rata-rata Skor IAA" sub="Skala 0–72">
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={stats.iaaByClassChart} margin={{ left: -10 }}>
+
+        {/* Avg score per class */}
+        <Card title="Rata-rata Skor IAA per Kelas" sub="Skala 0–72">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={stats.iaaByClassChart} margin={{ left: -10, top: 4 }}>
               <XAxis dataKey="kelas" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} domain={[0, 72]} />
-              <Tooltip formatter={(v: any) => [`${v}`, "Avg Skor IAA"]} />
-              <Bar dataKey="avgScore" fill={BLUE} radius={[4, 4, 0, 0]} />
+              <Tooltip formatter={(v: any) => [`${v}`, "Avg Skor IAA"]} labelFormatter={l => `Kelas: ${l}`} />
+              <Bar dataKey="avgScore" fill={BLUE} radius={[4, 4, 0, 0]} name="Avg Skor IAA" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
       </div>
-      <Card title="Perbandingan Skor IAA per Kelas" sub="Rata-rata skor kecanduan internet tiap kelas">
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={stats.iaaByClassChart} margin={{ left: -10 }}>
+
+      {/* Grouped bar — status count per class (matches picture) */}
+      <Card
+        title="Distribusi Skor Tingkat Kecanduan Internet Berdasarkan Kelas"
+        sub="Jumlah siswa per kategori kecanduan internet tiap kelas"
+      >
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={stats.iaaByClassChart} margin={{ left: -10, top: 4 }} barCategoryGap="20%" barGap={2}>
             <XAxis dataKey="kelas" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} domain={[0, 72]} />
-            <Tooltip formatter={(v: any) => [`${v}`, "Avg IAA"]} />
-            <Bar dataKey="avgScore" fill="#EF9F27" radius={[4, 4, 0, 0]} />
+            <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+            <Tooltip
+              formatter={(v: any, n: any) => [`${v} siswa`, n]}
+              labelFormatter={(l) => `Kelas: ${l}`}
+            />
+            <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: 11 }} />
+            <Bar dataKey="Tidak/Sedikit Kecanduan" name="Tidak/Sedikit Kecanduan" fill={STATUS_COLORS["Tidak/Sedikit Kecanduan"]} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="Kecanduan Borderline"    name="Kecanduan Borderline"    fill={STATUS_COLORS["Kecanduan Borderline"]}    radius={[3, 3, 0, 0]} />
+            <Bar dataKey="Kemungkinan Kecanduan"   name="Kemungkinan Kecanduan"   fill={STATUS_COLORS["Kemungkinan Kecanduan"]}   radius={[3, 3, 0, 0]} />
+            <Bar dataKey="Kecanduan Signifikan"    name="Kecanduan Signifikan"    fill={STATUS_COLORS["Kecanduan Signifikan"]}    radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </Card>
@@ -142,13 +175,14 @@ function IAASection({ stats }: { stats: Stats }) {
   );
 }
 
+// ── Page ───────────────────────────────────────────────────────
 export default function ResultsPage() {
   const { data: session, status } = useSession();
   const isAdmin = (session?.user as any)?.role === "admin";
-  const [tab, setTab] = useState<"sdq" | "iaa">("sdq");
+  const [tab, setTab]     = useState<"sdq" | "iaa">("sdq");
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]     = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/stats")
@@ -158,112 +192,70 @@ export default function ResultsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-sm text-gray-400 animate-pulse">Memuat…</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* ── Navbar ──────────────────────────────────────────── */}
-      <nav className="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-              <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white"/>
-              <rect x="14" y="3" width="7" height="7" rx="1.5" fill="white" opacity=".7"/>
-              <rect x="3" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".7"/>
-              <rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".5"/>
-            </svg>
-          </div>
-          <span className="text-sm font-semibold text-gray-800">Dashboard Skrining Kesehatan Mental dan Kecanduan Digital SMA 7 Semarang</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <a href="/"
-            className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors">
-            Home
-          </a>
-          <a href="/results"
-            className="text-xs font-medium px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors">
-            Dashboard
-          </a>
-          {isAdmin ? (
-            <a href="/dashboard"
-              className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Settings className="h-4 w-4" />
-              Panel Admin
-            </a>
-          ) : (
-            <a href="/signin"
-              className="text-xs font-medium px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              Login Admin
-            </a>
-          )}
-        </div>
-      </nav>
+      <Navbar session={session ?? null} status={status} />
 
-      {/* ── Main content ────────────────────────────────────── */}
-      <div className="max-w-screen-lg mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-8">
 
-        {/* ── Summary scorecards ── */}
+        {/* Stat cards — with Kemenkes range labels */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Stat label="Total Responden" value={stats.summary.totalRespondents} sub="siswa" />
-            <Stat label="Jumlah Kelas" value={stats.summary.totalKelas} sub="kelas" />
-            <Stat label="Rata-rata Skor IAA" value={stats.summary.avgIAA} sub="dari 72"
-              color={stats.summary.avgIAA >= 50 ? "text-red-600" : stats.summary.avgIAA >= 31 ? "text-amber-500" : "text-green-600"} />
-            <Stat label="Avg Kesulitan SDQ" value={stats.summary.avgSDQDifficulties} sub="dari 40"
-              color={stats.summary.avgSDQDifficulties > 19 ? "text-red-600" : stats.summary.avgSDQDifficulties > 15 ? "text-amber-500" : "text-green-600"} />
+            <StatCard label="Total Responden" value={stats.summary.totalRespondents} sub="siswa" />
+            <StatCard label="Jumlah Kelas" value={stats.summary.totalKelas} sub="kelas" />
+            <StatCard
+              label="Rata-rata Skor IAA"
+              value={stats.summary.avgIAA}
+              sub={iaaRangeLabel(stats.summary.iaaStatusLabel)}
+              valueColor={iaaValueColor(stats.summary.iaaStatusLabel)}
+              subColor={iaaValueColor(stats.summary.iaaStatusLabel)}
+            />
+            <StatCard
+              label="Rata-rata Kesulitan SDQ"
+              value={stats.summary.avgSDQDifficulties}
+              sub={sdqRangeLabel(stats.summary.sdqCategoryLabel)}
+              valueColor={sdqValueColor(stats.summary.sdqCategoryLabel)}
+              subColor={sdqValueColor(stats.summary.sdqCategoryLabel)}
+            />
           </div>
         )}
 
-        {/* ── Tab buttons ── */}
+        {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          <button onClick={() => setTab("sdq")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
-              tab === "sdq"
-                ? "bg-white border-blue-400 text-blue-700 shadow-sm"
-                : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
-            }`}>
-            <Brain className="h-4 w-4" /> SDQ Kemenkes
-          </button>
-          <button onClick={() => setTab("iaa")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
-              tab === "iaa"
-                ? "bg-white border-blue-400 text-blue-700 shadow-sm"
-                : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
-            }`}>
-            <Smartphone className="h-4 w-4" /> IAA
-          </button>
+          {(["sdq", "iaa"] as const).map(t => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
+                tab === t
+                  ? "bg-white border-blue-400 text-blue-700 shadow-sm"
+                  : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
+              }`}>
+              {t === "sdq" ? (
+                <><Brain className="h-4 w-4" /> SDQ Kemenkes</>
+              ) : (
+                <><Smartphone className="h-4 w-4" /> IAA</>
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* ── Loading state ── */}
         {loading && (
           <div className="flex items-center justify-center h-64">
             <div className="text-sm text-gray-400 animate-pulse">Memuat data dari Google Sheets…</div>
           </div>
         )}
-
-        {/* ── Error state ── */}
         {error && (
           <div className="p-5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
             <strong>Gagal memuat data:</strong> {error}
           </div>
         )}
-
-        {/* ── Chart content ── */}
         {stats && !loading && (
           tab === "sdq" ? <SDQSection stats={stats} /> : <IAASection stats={stats} />
         )}
       </div>
 
-      {/* ── Footer ──────────────────────────────────────────── */}
       <footer className="border-t border-gray-100 bg-white px-6 py-6 text-center text-xs text-gray-400 mt-12">
-        Dashboard Kesehatan Mental Siswa · SMA 7 Semarang · {new Date().getFullYear()}
+        Dashboard Kesehatan Mental Siswa · Data bersumber dari Google Sheets
       </footer>
     </div>
   );

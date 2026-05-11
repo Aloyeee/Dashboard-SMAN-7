@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Brain, Smartphone } from "lucide-react";
+import StatCard from "@/components/StatCard";
 import type { Stats } from "@/types";
 import {
   PieChart, Pie, Cell,
@@ -17,19 +18,6 @@ import {
 
 const BLUE   = "#378ADD";
 const PURPLE = "#9B6CF7";
-
-function StatCard({ label, value, sub, valueColor, subColor }: {
-  label: string; value: string | number;
-  sub?: string; valueColor?: string; subColor?: string;
-}) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 text-left">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className={`text-3xl font-bold tracking-tight mt-1 ${valueColor ?? "text-gray-800"}`}>{value}</p>
-      {sub && <p className={`text-xs mt-1 font-medium leading-snug ${subColor ?? "text-gray-400"}`}>{sub}</p>}
-    </div>
-  );
-}
 
 function ChartCard({ title, sub, children }: {
   title: string; sub?: string; children: React.ReactNode;
@@ -128,21 +116,21 @@ export default function StatsPanel() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ChartCard title="Total Kesulitan SDQ" sub="Distribusi status kesehatan mental siswa (Kemenkes)">
               <ResponsiveContainer width="100%" height={260}>
-                <PieChart>
+                <PieChart margin={{ top: 4, bottom: 36 }}>
                   <Pie data={sdqCategoryChart} dataKey="value" nameKey="name"
-                    cx="50%" cy="45%" innerRadius={70} outerRadius={100}
-                    startAngle={90} endAngle={-270} paddingAngle={2}
+                    cx="50%" cy="38%" innerRadius={64} outerRadius={88}
+                    startAngle={90} endAngle={-270} paddingAngle={8}
                     labelLine={false} label={false}>
                     {sdqCategoryChart.map((e, i) => (
                       <Cell key={i} fill={SDQ_COLORS[e.name] ?? "#ccc"} stroke="none" />
                     ))}
                   </Pie>
-                  <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+                  <text x="50%" y="40%" textAnchor="middle" dominantBaseline="middle">
                     <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalSDQ}</tspan>
                     <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
                   </text>
                   <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                  <Legend iconType="circle" iconSize={8} layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: 12, marginTop: 18 }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -180,21 +168,21 @@ export default function StatsPanel() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ChartCard title="Distribusi Status Kecanduan Internet" sub="Seluruh siswa berdasarkan kategori IAA">
               <ResponsiveContainer width="100%" height={260}>
-                <PieChart>
+                <PieChart margin={{ top: 4, bottom: 36 }}>
                   <Pie data={iaaStatusChart} dataKey="value" nameKey="name"
-                    cx="50%" cy="45%" innerRadius={70} outerRadius={100}
-                    startAngle={90} endAngle={-270} paddingAngle={2}
+                    cx="50%" cy="38%" innerRadius={64} outerRadius={88}
+                    startAngle={90} endAngle={-270} paddingAngle={8}
                     labelLine={false} label={false}>
                     {iaaStatusChart.map((e, i) => (
                       <Cell key={i} fill={IAA_COLORS[e.name] ?? "#ccc"} stroke="none" />
                     ))}
                   </Pie>
-                  <text x="50%" y="43%" textAnchor="middle" dominantBaseline="middle">
+                  <text x="50%" y="40%" textAnchor="middle" dominantBaseline="middle">
                     <tspan x="50%" dy="-0.4em" fontSize="32" fontWeight="700" fill="#111827">{totalIAA}</tspan>
                     <tspan x="50%" dy="1.6em"  fontSize="12" fill="#6b7280">Peserta</tspan>
                   </text>
                   <Tooltip formatter={(v: any, n: any) => [`${v} siswa`, n]} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                  <Legend iconType="circle" iconSize={8} layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ fontSize: 12, marginTop: 18 }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>

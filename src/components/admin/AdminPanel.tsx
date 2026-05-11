@@ -162,7 +162,7 @@ export default function AdminPanel({ initialConfig }: Props) {
         <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-gray-700">Data Table</h2>
+              <h2 className="text-sm font-semibold text-gray-700">Tabel Data</h2>
               <p className="text-xs text-gray-400 mt-0.5">Lihat dan cari data responden. Gunakan search dan filter untuk menemukan data spesifik.</p>
             </div>
           </div>
